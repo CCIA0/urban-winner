@@ -1,26 +1,82 @@
-<div class="journal-container">
-  <div class="header">
-    <h1>📖 Mi Diario Emocional</h1>
-    <p>Escribe libremente sobre tus pensamientos y emociones. La IA te ayudará a entenderlas mejor.</p>
+<div class="chatbot-container">
+  <div class="chat-header">
+    <div class="chat-title">
+      <h1>💬 Mi Diario Emocional</h1>
+      <p>Comparte tus pensamientos y emociones. La IA te responderá con insights útiles.</p>
+    </div>
   </div>
 
-  <!-- Formulario para nueva entrada -->
-  <div class="entry-form">
-    <textarea 
-      [(ngModel)]="entryText" 
-      placeholder="¿Cómo te sientes hoy? Escribe aquí tus pensamientos, emociones o lo que quieras compartir..." 
-      rows="5"
-      [disabled]="isLoading"
-      class="entry-textarea">
-    </textarea>
-    
-    <button 
-      (click)="submitEntry()" 
-      [disabled]="isLoading || !entryText.trim()"
-      class="submit-btn">
-      <span *ngIf="!isLoading">✨ Compartir</span>
-      <span *ngIf="isLoading">⏳ Enviando...</span>
-    </button>
+  <div #chatContainer class="chat-messages">
+    <!-- Todos los mensajes -->
+    <div *ngFor="let entry of entries" 
+         class="message" 
+         [class.user-message]="entry.type === 'user'" 
+         [class.ai-message]="entry.type === 'ai'">
+      
+      <div class="message-avatar">
+        {{ entry.type === 'user' ? '👤' : '🤖' }}
+      </div>
+      
+      <div class="message-content">
+        <div class="message-sender" *ngIf="entry.type === 'ai' && !entry.isWelcome">
+          Asistente IA
+        </div>
+        
+        <div class="message-text">{{ entry.text }}</div>
+        
+        <div class="message-analysis" *ngIf="entry.sentiment && entry.type === 'ai'">
+          <span class="sentiment-badge" 
+                [style.background-color]="getSentimentColor(entry.sentiment.sentiment.label)">
+            {{ entry.sentiment.sentiment.label | uppercase }}
+          </span>
+          <span class="emotion-icon">
+            {{ getEmotionIcon(entry.sentiment.emotion.label) }}
+            {{ entry.sentiment.emotion.label }}
+          </span>
+        </div>
+        
+        <div class="message-time">
+          {{ formatTime(entry.timestamp) }} • {{ formatDate(entry.timestamp) }}
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="entries.length === 1" class="empty-chat">
+      <div class="empty-icon">💭</div>
+      <h3>Aún no hay conversaciones</h3>
+      <p>Envía un mensaje para comenzar tu diario emocional</p>
+    </div>
+  </div>
+
+  <!-- Área de entrada de mensajes -->
+  <div class="chat-input-container">
+    <div class="typing-indicator" *ngIf="isLoading">
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <span>La IA está respondiendo...</span>
+    </div>
+
+    <div class="input-wrapper">
+      <textarea 
+        [(ngModel)]="messageText" 
+        placeholder="Escribe tu mensaje aquí..." 
+        rows="1"
+        [disabled]="isLoading"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+        class="message-input">
+      </textarea>
+      
+      <button 
+        (click)="sendMessage()" 
+        [disabled]="isLoading || !messageText.trim()"
+        class="send-button">
+        <span *ngIf="!isLoading">↑</span>
+        <span *ngIf="isLoading">⏳</span>
+      </button>
+    </div>
 
     <div *ngIf="errorMessage" class="error-message">
       ❌ {{ errorMessage }}
@@ -28,44 +84,6 @@
 
     <div *ngIf="successMessage" class="success-message">
       ✅ {{ successMessage }}
-    </div>
-  </div>
-
-  <!-- Lista de entradas -->
-  <div class="entries-list">
-    <div *ngFor="let entry of entries" class="entry-card">
-      <div class="entry-header">
-        <span class="entry-date">{{ formatDate(entry.created_at) }}</span>
-        <div class="sentiment-info">
-          <span 
-            class="sentiment-badge"
-            [style.background-color]="getSentimentColor(entry.sentiment_analysis.sentiment.label)">
-            {{ entry.sentiment_analysis.sentiment.label | uppercase }}
-          </span>
-          <span class="emotion-icon">
-            {{ getEmotionIcon(entry.sentiment_analysis.emotion.label) }}
-            {{ entry.sentiment_analysis.emotion.label }}
-          </span>
-        </div>
-      </div>
-      
-      <div class="entry-content">
-        <p class="entry-text">{{ entry.text }}</p>
-        
-        <div class="ai-feedback" *ngIf="entry.ai_feedback">
-          <div class="feedback-header">
-            <span class="ai-icon">🤖</span>
-            <strong>Feedback de IA:</strong>
-          </div>
-          <p class="feedback-text">{{ entry.ai_feedback }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="entries.length === 0" class="empty-state">
-      <div class="empty-icon">📝</div>
-      <h3>No hay entradas aún</h3>
-      <p>Escribe tu primera entrada para comenzar tu diario emocional</p>
     </div>
   </div>
 </div>
