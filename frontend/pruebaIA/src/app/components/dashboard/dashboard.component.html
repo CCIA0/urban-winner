@@ -1,1 +1,128 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>📊 Dashboard de Seguimiento Emocional</h1>
+    <p>Resumen general del estado emocional de los usuarios</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Cargando datos...</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage && !isLoading">
+    ❌ {{ errorMessage }}
+  </div>
+
+  <div class="dashboard-content" *ngIf="dashboardData && !isLoading">
+    <!-- Resumen General -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">👥</div>
+        <div class="card-content">
+          <h3>{{ dashboardData.total_users || 0 }}</h3>
+          <p>Usuarios Registrados</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon">📝</div>
+        <div class="card-content">
+          <h3>{{ dashboardData.total_entries || 0 }}</h3>
+          <p>Entradas Totales</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon">😊</div>
+        <div class="card-content">
+          <h3>
+            {{
+              dashboardData.avg_sentiment_score * 100 || 0 | number : "1.0-0"
+            }}%
+          </h3>
+          <p>Sentimiento Promedio</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon">📅</div>
+        <div class="card-content">
+          <h3>{{ dashboardData.entries_last_week || 0 }}</h3>
+          <p>Entradas esta semana</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-container">
+      <!-- Distribución de Sentimientos -->
+      <div class="chart-section">
+        <h2>Distribución de Sentimientos</h2>
+        <div class="sentiment-distribution">
+          <!-- Verificar si es array antes de usar ngFor -->
+          <div
+            class="sentiment-item"
+            *ngFor="let sentiment of dashboardData.sentiment_distribution || []"
+          >
+            <div class="sentiment-header">
+              <span class="sentiment-label">{{
+                sentiment.sentiment | uppercase
+              }}</span>
+              <span class="sentiment-count"
+                >{{ sentiment.count }} ({{ sentiment.percentage }}%)</span
+              >
+            </div>
+            <div class="sentiment-bar">
+              <div
+                class="sentiment-progress"
+                [style.width]="sentiment.percentage + '%'"
+                [style.background-color]="
+                  getSentimentColor(sentiment.sentiment)
+                "
+              ></div>
+            </div>
+          </div>
+
+          <!-- Mensaje si no hay datos -->
+          <div
+            *ngIf="
+              !dashboardData.sentiment_distribution ||
+              dashboardData.sentiment_distribution.length === 0
+            "
+            class="no-data"
+          >
+            No hay datos de sentimientos disponibles
+          </div>
+        </div>
+      </div>
+
+      <!-- Emociones más comunes -->
+      <div class="chart-section">
+        <h2>Emociones más Comunes</h2>
+        <div class="emotions-grid">
+          <!-- Verificar si es array antes de usar ngFor -->
+          <div
+            class="emotion-item"
+            *ngFor="let emotion of dashboardData.top_emotions || []"
+          >
+            <span class="emotion-icon">{{
+              getEmotionIcon(emotion.emotion)
+            }}</span>
+            <span class="emotion-name">{{ emotion.emotion }}</span>
+            <span class="emotion-count">{{ emotion.count }}</span>
+          </div>
+
+          <!-- Mensaje si no hay datos -->
+          <div
+            *ngIf="
+              !dashboardData.top_emotions ||
+              dashboardData.top_emotions.length === 0
+            "
+            class="no-data"
+          >
+            No hay datos de emociones disponibles
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

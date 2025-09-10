@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../services/api.service';
+import { DashboardService, DashboardData } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,11 +10,11 @@ import { ApiService } from '../../services/api.service';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-  dashboardData: any = null;
+  dashboardData: DashboardData | null = null;
   isLoading: boolean = true;
   errorMessage: string = '';
 
-  constructor(private apiService: ApiService) {}
+  constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
     this.loadDashboard();
@@ -22,7 +22,7 @@ export class DashboardComponent implements OnInit {
 
   loadDashboard() {
     this.isLoading = true;
-    this.apiService.getDashboard().subscribe({
+    this.dashboardService.getDashboardData().subscribe({
       next: (data) => {
         this.dashboardData = data;
         this.isLoading = false;
@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
         console.error('Error loading dashboard:', error);
         this.errorMessage = 'Error al cargar el dashboard';
         this.isLoading = false;
+        this.dashboardData = this.dashboardService.getDefaultDashboardData();
       }
     });
   }
@@ -41,6 +42,19 @@ export class DashboardComponent implements OnInit {
       case 'neg': return '#f44336';
       case 'neu': return '#ff9800';
       default: return '#9e9e9e';
+    }
+  }
+
+  getEmotionIcon(emotion: string): string {
+    switch (emotion.toLowerCase()) {
+      case 'joy': return '😊';
+      case 'sadness': return '😢';
+      case 'anger': return '😠';
+      case 'fear': return '😨';
+      case 'surprise': return '😲';
+      case 'disgust': return '🤢';
+      case 'neutral': return '😐';
+      default: return '😐';
     }
   }
 }
