@@ -1,12 +1,21 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:prod",
-  "outputDirectory": "dist/prueba-ia/browser",
-  "framework": "angular",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/prueba-ia/browser"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "dest": "/index.html"
     }
   ]
 }
