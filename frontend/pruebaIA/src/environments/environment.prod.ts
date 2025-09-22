@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://tu-backend-render.onrender.com/api/v1', // Reemplaza con tu URL de Render
+  apiUrl: 'https://diario-emocional-api.onrender.com/api/v1',
   appName: 'Diario Emocional'
 };
