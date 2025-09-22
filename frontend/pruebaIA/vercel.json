@@ -15,5 +15,7 @@
       "dest": "/index.html"
     }
   ],
-  "buildCommand": "npm run build:prod"
+  "buildCommand": "npm run build:prod",
+  "installCommand": "npm ci",
+  "framework": "angular"
 }

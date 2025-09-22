@@ -1,0 +1,6 @@
+# Ignorar carpetas que causan problemas
+../../diario_emocional_mvp
+../../venv
+../../workspace-code-diario.code-workspace
+node_modules
+.angular
