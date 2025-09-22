@@ -196,6 +196,8 @@ export class JournalComponent implements OnInit, AfterViewChecked {
       case 'fear': return '😨';
       case 'surprise': return '😲';
       case 'disgust': return '🤢';
+      case 'love': return '😍';
+      case 'neutral': return '😐';
       default: return '😐';
     }
   }
