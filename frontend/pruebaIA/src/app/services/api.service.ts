@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, retry } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface JournalEntry {
   id: number;
@@ -29,19 +31,46 @@ export interface CreateEntryRequest {
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = '/api/v1'; // Ruta relativa para el proxy
+  private readonly baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
+
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'Ha ocurrido un error desconocido';
+    
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Error del servidor
+      errorMessage = `Código de error: ${error.status}\nMensaje: ${error.message}`;
+    }
+    
+    console.error('Error en API Service:', errorMessage);
+    return throwError(() => errorMessage);
+  }
 
   createEntry(entry: CreateEntryRequest): Observable<JournalEntry> {
-    return this.http.post<JournalEntry>(`${this.baseUrl}/journal/entries`, entry);
+    return this.http.post<JournalEntry>(`${this.baseUrl}/journal/entries`, entry)
+      .pipe(
+        retry(1),
+        catchError(this.handleError)
+      );
   }
 
   getUserEntries(userId: string): Observable<JournalEntry[]> {
-    return this.http.get<JournalEntry[]>(`${this.baseUrl}/journal/entries/${userId}`);
+    return this.http.get<JournalEntry[]>(`${this.baseUrl}/journal/entries/${userId}`)
+      .pipe(
+        retry(1),
+        catchError(this.handleError)
+      );
   }
 
   getDashboard(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/dashboard`);
+    return this.http.get<any>(`${this.baseUrl}/dashboard`)
+      .pipe(
+        retry(1),
+        catchError(this.handleError)
+      );
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ApiService, JournalEntry } from './api.service';
+import { ApiService } from './api.service';
 import { Observable, map, catchError, of } from 'rxjs';
 
 export interface DashboardData {

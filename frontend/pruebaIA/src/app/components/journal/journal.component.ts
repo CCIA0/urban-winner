@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, JournalEntry } from '../../services/api.service';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-journal',
@@ -14,7 +14,7 @@ export class JournalComponent implements OnInit, AfterViewChecked {
   messageText: string = '';
   isLoading: boolean = false;
   entries: any[] = []; // Cambiamos el tipo para agrupar user+AI
-  userId: string = 'estudiante_1';
+  userId: string = 'user123';
   errorMessage: string = '';
   successMessage: string = '';
   
